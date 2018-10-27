@@ -1,0 +1,6 @@
+{
+  "port": 8888,
+  "startDelay": 100,
+  "downloadFrequency": "0 0/10 * * * ?",
+  "downloadFolder": "images"
+}
