@@ -96,9 +96,7 @@ public class Main {
             throw new IllegalStateException("Unable to read 'config.json'.", e);
         }
 
-        /**
-         * Global Drive API client.
-         */
+        // Global Drive API client.
         Drive drive;
         try {
             httpTransport = GoogleNetHttpTransport.newTrustedTransport();

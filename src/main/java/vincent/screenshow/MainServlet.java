@@ -71,13 +71,7 @@ public class MainServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
         PrintWriter writer = response.getWriter();
-
-//        int pin;
-//        try (java.util.Scanner s = new java.util.Scanner(request.getInputStream()).useDelimiter("\\A")) {
-//            pin = Integer.parseInt(s.hasNext() ? s.next() : "-1");
-//        }
         writer.print("put");
-
     }
 
     private String getHtml() throws Exception {

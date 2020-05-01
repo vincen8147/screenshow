@@ -29,7 +29,9 @@ import org.slf4j.LoggerFactory;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
@@ -72,6 +74,7 @@ class GoogleDriveSync {
 
     void downloadFromFolder() throws IOException {
         String pageToken = null;
+        Set<String> googleSyncedFiles = new HashSet<>();
         do {
             FileList result = googleDrive.files().list()
                     .setQ("mimeType != 'application/vnd.google-apps.folder' "
@@ -83,18 +86,34 @@ class GoogleDriveSync {
                     .setPageToken(pageToken)
                     .execute();
             for (File file : result.getFiles()) {
-                downloadFile(file);
+                googleSyncedFiles.add(downloadFile(file).getAbsolutePath());
             }
             pageToken = result.getNextPageToken();
         } while (pageToken != null);
+
+        deleteRemovedFiles(googleSyncedFiles);
     }
 
-    private void downloadFile(File file) throws IOException {
+    private void deleteRemovedFiles(Set<String> googleSyncedFiles) {
+        java.io.File[] files = downloadFolder.listFiles();
+        if (null == files) {
+            return;
+        }
+        for (java.io.File file : files) {
+            if (!file.isDirectory() && !googleSyncedFiles.contains(file.getAbsolutePath())) {
+                //if (file.delete()) {
+                logger.info("Deleting removed file: {}", file.getAbsolutePath());
+                //}
+            }
+        }
+    }
+
+    private java.io.File downloadFile(File file) throws IOException {
         String safeFileName = safeFileName(file.getName());
         java.io.File saveAs = new java.io.File(downloadFolder, safeFileName);
         if (saveAs.exists()) {
             logger.info("Not downloading existing file: " + saveAs.getAbsolutePath());
-            return;
+            return saveAs;
         }
         java.io.File downloadTo = java.io.File.createTempFile("acc-sync_", "_" + safeFileName, downloadTempFolder);
         logger.info("downloading file:" + safeFileName + " to " + downloadTo.getAbsolutePath());
@@ -107,6 +126,7 @@ class GoogleDriveSync {
         }
         downloadTo.renameTo(saveAs);
         logger.info("Download Complete: " + saveAs.getAbsolutePath());
+        return saveAs;
     }
 
     private String safeFileName(String name) {
