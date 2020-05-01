@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Arrays.stream;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -99,13 +100,11 @@ class GoogleDriveSync {
         if (null == files) {
             return;
         }
-        for (java.io.File file : files) {
-            if (!file.isDirectory() && !googleSyncedFiles.contains(file.getAbsolutePath())) {
-                //if (file.delete()) {
-                logger.info("Deleting removed file: {}", file.getAbsolutePath());
-                //}
-            }
-        }
+        stream(files)
+                .filter(file -> !file.isDirectory()
+                        && !googleSyncedFiles.contains(file.getAbsolutePath())
+                        && file.delete())
+                .forEach(file -> logger.info("Deleting removed file: {}", file.getAbsolutePath()));
     }
 
     private java.io.File downloadFile(File file) throws IOException {
