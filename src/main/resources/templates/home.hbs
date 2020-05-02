@@ -2,26 +2,20 @@
 <head>
     <script>
 
-function toggle(pin) {
-    httpPutAsync(pin, "/", function(responseText) {
-        for (var index in responseText) {
-            var key = index; //This is the map's key.
-            for (i = 0; i < responseText[key].length; i++) {
-                var val = responseText[key]; //This is the value part for the map's key.
-                document.getElementById('pin' + key).textContent = val;
-            }
-        }
+function sync() {
+    httpPutAsync("sync", "/", function(responseText) {
+        alert(responseText);
     });
 }
 
-function httpPutAsync(pin, theUrl, callback) {
+function httpPutAsync(action, theUrl, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
             callback(JSON.parse(xmlHttp.responseText));
     }
     xmlHttp.open("PUT", theUrl, true); // true for asynchronous
-    xmlHttp.send(pin);
+    xmlHttp.send(action);
     
 }
 
@@ -42,7 +36,7 @@ function httpPutAsync(pin, theUrl, callback) {
             <td>{{port}}</td>
             <td>{{startDelay}}</td>
             <td>{{folder}}</td>
-            <td><input type="button" value="Update" onclick="xxx"/></td>
+            <td><input type="button" value="Update" onclick="sync()"/></td>
         </tr>
 </table>
 

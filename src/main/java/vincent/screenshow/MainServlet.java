@@ -39,11 +39,13 @@ public class MainServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     private final Template template;
-    private ScreenshowConfig config;
+    private final ScreenshowConfig config;
+    private final GoogleDriveSync googleDriveSync;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    MainServlet(ScreenshowConfig config) {
+    MainServlet(ScreenshowConfig config, GoogleDriveSync googleDriveSync) {
         this.config = config;
+        this.googleDriveSync = googleDriveSync;
         TemplateLoader loader = new ClassPathTemplateLoader("/templates", ".hbs");
         Handlebars handlebars = new Handlebars(loader);
         try {
@@ -69,9 +71,14 @@ public class MainServlet extends HttpServlet {
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String req = new String(request.getInputStream().readAllBytes());
+        if (req.equals("sync")) {
+            logger.info("manual sync requested from " + request.getRemoteAddr());
+            googleDriveSync.downloadFromFolder();
+        }
         response.setContentType("text/plain");
         PrintWriter writer = response.getWriter();
-        writer.print("put");
+        writer.print("{\"hi\":\"hello\"");
     }
 
     private String getHtml() throws Exception {

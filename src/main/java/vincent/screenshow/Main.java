@@ -136,7 +136,7 @@ public class Main {
         try {
             googleDriveSync = new GoogleDriveSync(config, drive, args[1]);
 
-            MainServlet mainServlet = new MainServlet(config);
+            MainServlet mainServlet = new MainServlet(config, googleDriveSync);
             ServletHolder servletHolder = new ServletHolder();
             servletHolder.setServlet(mainServlet);
             handler.addServletWithMapping(servletHolder, "/");
