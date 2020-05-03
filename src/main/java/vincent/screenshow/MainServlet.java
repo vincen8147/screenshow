@@ -32,8 +32,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+
+import static javax.servlet.http.HttpServletResponse.*;
 
 public class MainServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -57,35 +61,47 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
-        PrintWriter writer = response.getWriter();
         try {
-            writer.println(getHtml());
-            response.setStatus(HttpServletResponse.SC_OK);
-            logger.info("Serving request: "+ request.getPathInfo());
+
+            String uri = request.getRequestURI();
+            if (uri.endsWith(".heic") || uri.endsWith(".HEIC")) {
+                response.setStatus(SC_NOT_IMPLEMENTED);
+            } else if (uri.startsWith("/" + config.getDownloadFolder())) {
+                Path path = Path.of(config.getDownloadFolder(), uri.substring(uri.lastIndexOf("/")));
+                new FileInputStream(path.toFile()).transferTo(response.getOutputStream());
+                response.setStatus(SC_OK);
+            } else if (uri.equals("/")) {
+                response.getWriter().println(getHtml());
+                response.setContentType("text/html");
+                response.setStatus(SC_OK);
+            } else {
+                response.setStatus(SC_NOT_FOUND);
+            }
+            logger.info("Serving request uri: " + uri);
         } catch (Exception e) {
             e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(SC_INTERNAL_SERVER_ERROR);
             throw new IllegalStateException("unable to process", e);
         }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PrintWriter writer = response.getWriter();
         String req = new String(request.getInputStream().readAllBytes());
         if (req.equals("sync")) {
             logger.info("manual sync requested from " + request.getRemoteAddr());
             googleDriveSync.downloadFromFolder();
+            writer.print("{\"message\":\"Sync Requested.\"}");
         }
         response.setContentType("text/plain");
-        PrintWriter writer = response.getWriter();
-        writer.print("{\"hi\":\"hello\"");
     }
 
     private String getHtml() throws Exception {
         return template.apply(getContext());
     }
 
-    private Context getContext() {
+    private synchronized Context getContext() {
+        config.setFiles(googleDriveSync.getFiles());
         return Context.newBuilder(config)
                 .resolver(JsonNodeValueResolver.INSTANCE,
                         JavaBeanValueResolver.INSTANCE,

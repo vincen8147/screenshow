@@ -28,12 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
+import static java.util.Comparator.comparing;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.JobBuilder.newJob;
 import static org.quartz.TriggerBuilder.newTrigger;
@@ -46,9 +45,11 @@ class GoogleDriveSync {
     private final java.io.File downloadTempFolder;
     private final Scheduler scheduler;
 
+    private final ScreenshowConfig config;
     private Drive googleDrive;
 
     GoogleDriveSync(ScreenshowConfig config, Drive googleDrive, String driveFolderId) throws SchedulerException {
+        this.config = config;
         this.googleDrive = googleDrive;
         this.downloadFolder = new java.io.File(config.getDownloadFolder());
         this.driveFolderId = driveFolderId;
@@ -71,6 +72,22 @@ class GoogleDriveSync {
         scheduler = sf.getScheduler();
         scheduler.scheduleJob(jobDetail, trigger);
         scheduler.start();
+    }
+
+    List<ScreenshowFile> getFiles() {
+        java.io.File[] files = downloadFolder.listFiles();
+        if (null == files) {
+            return Collections.emptyList();
+        }
+        return stream(files)
+                .filter(java.io.File::isFile)
+                .filter(file -> !file.getName().endsWith(".heic"))
+                .sorted(comparing(java.io.File::getName))
+                .map(file -> new ScreenshowFile(
+                        "/" + config.getDownloadFolder() + "/" + file.getName(),
+                        new Date(file.lastModified()).toString(),
+                        file.getName()))
+                .collect(Collectors.toList());
     }
 
     void downloadFromFolder() throws IOException {

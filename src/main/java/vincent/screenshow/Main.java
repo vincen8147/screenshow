@@ -32,12 +32,10 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.component.AbstractLifeCycle.AbstractLifeCycleListener;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,11 +121,6 @@ public class Main {
         // This handler then needs to be registered with the Server object.
         HandlerCollection handlers = new HandlerCollection();
         server.setHandler(handlers);
-
-        ResourceHandler fileHandler = new ResourceHandler();
-        fileHandler.setBaseResource(Resource.newClassPathResource("script"));
-        fileHandler.setDirectoriesListed(true);
-        handlers.addHandler(fileHandler);
 
         ServletHandler handler = new ServletHandler();
         handlers.addHandler(handler);

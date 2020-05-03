@@ -21,25 +21,38 @@ function httpPutAsync(action, theUrl, callback) {
 
 
 
+
     </script>
 </head>
 <body>
 <h1>Screen Show Config</h1>
 <table border="1" cellpadding="15px">
     <tr>
-        <th>port</th>
-        <th>startDelay</th>
-        <th>folder</th>
+        <th>Folder</th>
+        <th>Schedule</th>
         <th></th>
     </tr>
-        <tr>
-            <td>{{port}}</td>
-            <td>{{startDelay}}</td>
-            <td>{{folder}}</td>
-            <td><input type="button" value="Update" onclick="sync()"/></td>
-        </tr>
+    <tr>
+        <td>{{downloadFolder}}</td>
+        <td>{{downloadFrequency}}</td>
+        <td><input type="button" value="Update" onclick="sync()"/></td>
+    </tr>
 </table>
-
-
+<table border="1" cellpadding="15px">
+    <thead>
+    <th>Image</th>
+    <th>Create Date</th>
+    <th>File Name</th>
+    </thead>
+    <tbody>
+    {{#each files}}
+        <tr>
+            <td><img src="{{imageUrl}}" width="200px"/></td>
+            <td>{{fileDate}}</td>
+            <td>{{fileName}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
 </body>
 </html>

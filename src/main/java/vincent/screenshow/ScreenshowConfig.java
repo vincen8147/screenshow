@@ -15,12 +15,16 @@
  */
 package vincent.screenshow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ScreenshowConfig {
 
     private int port;
     private long startDelay;
     private String downloadFolder;
     private String downloadFrequency;
+    private List<ScreenshowFile> files = new ArrayList<>();
 
     public int getPort() {
         return port;
@@ -52,5 +56,14 @@ public class ScreenshowConfig {
 
     public void setDownloadFrequency(String downloadFrequency) {
         this.downloadFrequency = downloadFrequency;
+    }
+
+    public List<ScreenshowFile> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<ScreenshowFile> files) {
+        this.files.clear();
+        this.files.addAll(files);
     }
 }
