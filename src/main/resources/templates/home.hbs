@@ -35,7 +35,8 @@ function httpPutAsync(action, theUrl, callback) {
     <tr>
         <td>{{downloadFolder}}</td>
         <td>{{downloadFrequency}}</td>
-        <td><input type="button" value="Update" onclick="sync()"/></td>
+        <td><a target="drive" href="https://drive.google.com/drive/u/0/folders/{{googleFolderId}}">Link to Google Drive Folder</a></td>
+        <td><input type="button" value="Sync Now" onclick="sync()"/></td>
     </tr>
 </table>
 <table border="1" cellpadding="15px">

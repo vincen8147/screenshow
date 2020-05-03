@@ -90,6 +90,7 @@ public class Main {
             if (config.getPort() <= 0) {
                 throw new IllegalStateException("Problem with config?");
             }
+            config.setGoogleFolderId(args[1]);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read 'config.json'.", e);
         }
@@ -127,7 +128,7 @@ public class Main {
 
         // Start things up!
         try {
-            googleDriveSync = new GoogleDriveSync(config, drive, args[1]);
+            googleDriveSync = new GoogleDriveSync(config, drive);
 
             MainServlet mainServlet = new MainServlet(config, googleDriveSync);
             ServletHolder servletHolder = new ServletHolder();

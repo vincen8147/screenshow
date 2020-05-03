@@ -24,6 +24,7 @@ public class ScreenshowConfig {
     private long startDelay;
     private String downloadFolder;
     private String downloadFrequency;
+    private String googleFolderId;
     private List<ScreenshowFile> files = new ArrayList<>();
 
     public int getPort() {
@@ -56,6 +57,14 @@ public class ScreenshowConfig {
 
     public void setDownloadFrequency(String downloadFrequency) {
         this.downloadFrequency = downloadFrequency;
+    }
+
+    public String getGoogleFolderId() {
+        return googleFolderId;
+    }
+
+    public void setGoogleFolderId(String googleFolderId) {
+        this.googleFolderId = googleFolderId;
     }
 
     public List<ScreenshowFile> getFiles() {

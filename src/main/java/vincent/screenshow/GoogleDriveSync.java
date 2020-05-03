@@ -41,18 +41,16 @@ import static org.quartz.core.jmx.JobDataMapSupport.newJobDataMap;
 class GoogleDriveSync {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     private final java.io.File downloadFolder;
-    private String driveFolderId;
     private final java.io.File downloadTempFolder;
     private final Scheduler scheduler;
 
     private final ScreenshowConfig config;
     private Drive googleDrive;
 
-    GoogleDriveSync(ScreenshowConfig config, Drive googleDrive, String driveFolderId) throws SchedulerException {
+    GoogleDriveSync(ScreenshowConfig config, Drive googleDrive) throws SchedulerException {
         this.config = config;
         this.googleDrive = googleDrive;
         this.downloadFolder = new java.io.File(config.getDownloadFolder());
-        this.driveFolderId = driveFolderId;
         this.downloadTempFolder = new java.io.File(this.downloadFolder, "inprogress");
         this.downloadTempFolder.mkdirs();
         logger.info("Configured download folder = " + this.downloadFolder.getAbsolutePath());
@@ -97,7 +95,7 @@ class GoogleDriveSync {
             FileList result = googleDrive.files().list()
                     .setQ("mimeType != 'application/vnd.google-apps.folder' "
                             + "and trashed = false and '"
-                            + driveFolderId + "' in parents")
+                            + config.getGoogleFolderId() + "' in parents")
 
                     .setSpaces("drive")
                     .setFields("files,nextPageToken")
@@ -157,7 +155,7 @@ class GoogleDriveSync {
         }
     }
 
-    private class ProgressListener implements MediaHttpDownloaderProgressListener {
+    private static class ProgressListener implements MediaHttpDownloaderProgressListener {
 
         @Override
         public void progressChanged(MediaHttpDownloader mediaHttpDownloader) throws IOException {
