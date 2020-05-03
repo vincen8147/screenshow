@@ -4,7 +4,7 @@
 
 function sync() {
     httpPutAsync("sync", "/", function(responseText) {
-        alert(responseText);
+        alert(responseText.message);
     });
 }
 
